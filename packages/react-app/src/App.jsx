@@ -8,6 +8,7 @@ import {
   useOnBlock,
   useUserProviderAndSigner,
 } from "eth-hooks";
+import { useEventListener } from "eth-hooks/events/useEventListener";
 import { useExchangeEthPrice } from "eth-hooks/dapps/dex";
 import React, { useCallback, useEffect, useState } from "react";
 import { Link, Route, Switch, useLocation } from "react-router-dom";
@@ -29,7 +30,7 @@ import externalContracts from "./contracts/external_contracts";
 // contracts
 import deployedContracts from "./contracts/hardhat_contracts.json";
 import { Transactor, Web3ModalSetup } from "./helpers";
-import { Home, ExampleUI, Hints, Subgraph } from "./views";
+import { Home, ExampleUI, Hints, Subgraph, CommitReveal } from "./views";
 import { useStaticJsonRPC } from "./hooks";
 
 const { ethers } = require("ethers");
@@ -244,6 +245,10 @@ function App(props) {
 
   const faucetAvailable = localProvider && localProvider.connection && targetNetwork.name.indexOf("local") !== -1;
 
+  // register the events
+  const commitEvents = useEventListener(readContracts, "YourContract", "CommitHash", localProvider, 1);
+  const revealEvents = useEventListener(readContracts, "YourContract", "RevealHash", localProvider, 1);
+
   return (
     <div className="App">
       {/* ✏️ Edit the header and change the title to your project name */}
@@ -292,6 +297,9 @@ function App(props) {
         </Menu.Item>
         <Menu.Item key="/debug">
           <Link to="/debug">Debug Contracts</Link>
+        </Menu.Item>
+        <Menu.Item key="/commitReveal">
+          <Link to="/commitReveal">Commit & Reveal Events</Link>
         </Menu.Item>
         <Menu.Item key="/hints">
           <Link to="/hints">Hints</Link>
@@ -381,6 +389,16 @@ function App(props) {
             mainnetProvider={mainnetProvider}
           />
         </Route>
+        <Route path="/commitReveal">
+          <CommitReveal
+            commitEvents={commitEvents}
+            revealEvents={revealEvents}
+            mainnetProvider={mainnetProvider}
+            readContracts={readContracts}
+            writeContracts={writeContracts}
+            tx={tx}
+          />
+        </Route>
       </Switch>
 
       <ThemeSwitch />
@@ -413,14 +431,8 @@ function App(props) {
 
         <Row align="middle" gutter={[4, 4]}>
           <Col span={24}>
-            {
-              /*  if the local provider has a signer, let's show the faucet:  */
-              faucetAvailable ? (
-                <Faucet localProvider={localProvider} price={price} ensProvider={mainnetProvider} />
-              ) : (
-                ""
-              )
-            }
+            {/*  if the local provider has a signer, let's show the faucet:  */
+            faucetAvailable ? <Faucet localProvider={localProvider} price={price} ensProvider={mainnetProvider} /> : ""}
           </Col>
         </Row>
       </div>
