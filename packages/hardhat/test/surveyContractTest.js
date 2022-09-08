@@ -25,21 +25,21 @@ const SAMPLE_SURVEY_DESCRIPTOR = {
     {
       id: 1,
       title: "What is your name?",
-      questionType: "text",
+      type: "text",
       options: null,
       required: true,
     },
     {
       id: 2,
       title: "What is day of birth?",
-      questionType: "datetime",
+      type: "datetime",
       options: null,
       required: false,
     },
     {
       id: 3,
       title: "What is your favourite pets?",
-      questionType: "checkbox",
+      type: "checkbox",
       options: [
         { id: 1, title: "Dog" },
         { id: 2, title: "Cat" },
@@ -50,7 +50,7 @@ const SAMPLE_SURVEY_DESCRIPTOR = {
     {
       id: 4,
       title: "What is your favourite color?",
-      questionType: "select",
+      type: "select",
       options: [
         { id: 1, title: "Red" },
         { id: 2, title: "Green" },
@@ -61,7 +61,7 @@ const SAMPLE_SURVEY_DESCRIPTOR = {
     {
       id: 5,
       title: "What is your favourite programming language?",
-      questionType: "radio",
+      type: "radio",
       options: [
         { id: 1, title: "C++" },
         { id: 2, title: "Java" },
@@ -100,7 +100,9 @@ const SAMPLE_RESPONSE_ANSWER = [
   },
 ];
 
-let currentNonce = 0;
+let currentNonce = 1;
+let publicSurveyId;
+let privateSurveyId;
 
 describe("Test ETH Poller", function() {
   let surveyContract;
@@ -122,19 +124,17 @@ describe("Test ETH Poller", function() {
       it("Should revert the survey creation with error invalid survey mode", async function() {});
 
       it("Should be able to create a new survey", async function() {
-        const [owner] = await ethers.getSigners();
-
         const surveyDescriptor = toHexString(SAMPLE_SURVEY_DESCRIPTOR);
-        const surveyMode = "public";
+        const surveyMode = 0; // "public"
 
         const expectedId = currentNonce;
         const expectedDescriptor = surveyDescriptor;
-        const expectedMode = "public";
 
         expect(await surveyContract.createSurvey(surveyDescriptor, surveyMode, [], 0))
           .to.emit(surveyContract, "CreateSurvey")
-          .withArgs(expectedId, expectedMode, expectedDescriptor, [], 0);
+          .withArgs(expectedId, surveyMode, expectedDescriptor, [], 0);
 
+        publicSurveyId = expectedId;
         currentNonce++;
 
         const surveyList = await surveyContract.getSurveyList();
@@ -146,18 +146,18 @@ describe("Test ETH Poller", function() {
         const [owner] = await ethers.getSigners();
 
         const surveyDescriptor = toHexString({ title: "Test Survey 2", question: [] });
-        const surveyMode = "private";
+        const surveyMode = 1; // private
         const pollsters = [await owner.getAddress()];
         const expireAt = parseInt(new Date().getTime() / 1000 + 30);
 
         const expectedId = currentNonce;
         const expectedDescriptor = surveyDescriptor;
-        const expectedMode = "private";
 
         expect(await surveyContract.createSurvey(surveyDescriptor, surveyMode, pollsters, expireAt))
           .to.emit(surveyContract, "CreateSurvey")
-          .withArgs(expectedId, expectedMode, expectedDescriptor, pollsters, expireAt);
+          .withArgs(expectedId, surveyMode, expectedDescriptor, pollsters, expireAt);
 
+        privateSurveyId = expectedId;
         currentNonce++;
 
         const surveyList = await surveyContract.getSurveyList();
@@ -166,25 +166,59 @@ describe("Test ETH Poller", function() {
         expect(toJSONObj(surveyList[1]["descriptor"])["title"]).to.equal("Test Survey 2");
       });
 
+      it("Should not be able to submit the private survey", async function() {
+        const [owner, otherAccount] = await ethers.getSigners();
+        await expect(surveyContract.connect(otherAccount).submitResponse(privateSurveyId, "0x00")).to.be.revertedWith(
+          "SurveyContract::submitResponse - sender does not allow to submit this survey!"
+        );
+      });
+
+      it("Should not be able to submit the response after it is expired", async function() {
+        // create another survey which end right after that
+        const surveyDescriptor = toHexString(SAMPLE_SURVEY_DESCRIPTOR);
+        const surveyMode = 0; // public
+        const expireAt = parseInt(new Date().getTime() / 1000);
+
+        const expectedId = currentNonce;
+
+        expect(await surveyContract.createSurvey(surveyDescriptor, surveyMode, [], expireAt))
+          .to.emit(surveyContract, "CreateSurvey")
+          .withArgs(expectedId, surveyMode, surveyDescriptor, [], expireAt);
+        currentNonce++;
+
+        await network.provider.send("evm_increaseTime", [1 /* 1 second */]);
+        await network.provider.send("evm_mine");
+
+        // try submit the ended survey
+        await expect(surveyContract.submitResponse(expectedId, "0x00")).to.be.revertedWith(
+          "SurveyContract::submitResponse - the survey is ended."
+        );
+      });
+
       it("Should be able to submit the response", async function() {
         const [owner] = await ethers.getSigners();
 
         const surveyDescriptor = toHexString(SAMPLE_SURVEY_DESCRIPTOR);
-        const surveyId = 0;
         const answer = toHexString(SAMPLE_RESPONSE_ANSWER);
 
         const expectedResponseId = currentNonce;
         const expectedPollster = await owner.getAddress();
 
-        expect(await surveyContract.submitResponse(surveyId, answer))
+        expect(await surveyContract.submitResponse(publicSurveyId, answer))
           .to.emit(surveyContract, "SubmitResponse")
-          .withArgs(expectedResponseId, surveyId, expectedPollster, answer);
+          .withArgs(expectedResponseId, publicSurveyId, expectedPollster, answer);
 
         currentNonce++;
 
-        const responseList = await surveyContract.getResponsesBySurvey(surveyId);
+        const responseList = await surveyContract.getResponsesBySurvey(publicSurveyId);
         expect(responseList.length).to.equal(1);
         expect(toJSONObj(responseList[0]["answer"])).to.deep.equal(SAMPLE_RESPONSE_ANSWER);
+      });
+
+      it("Should not be able to submit the response twice", async function() {
+        await expect(surveyContract.submitResponse(publicSurveyId, "0x00")).to.be.revertedWith(
+          "SurveyContract::submitResponse - sender already summitted response."
+        );
       });
     });
   });
