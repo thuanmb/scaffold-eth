@@ -186,7 +186,7 @@ describe("Test ETH Poller", function() {
           .withArgs(expectedId, surveyMode, surveyDescriptor, [], expireAt);
         currentNonce++;
 
-        await network.provider.send("evm_increaseTime", [1 /* 1 second */]);
+        await network.provider.send("evm_increaseTime", [2 /* seconds */]);
         await network.provider.send("evm_mine");
 
         // try submit the ended survey

@@ -1,4 +1,43 @@
 .App {
-  text-align: center;
-  padding-left: calc(100vw - 100%);
+	text-align: center;
+	padding-left: calc(100vw - 100%);
+}
+
+.t-c-w {
+	color: #ffffff;
+}
+
+.site-layout-content {
+	min-height: 280px;
+	padding: 24px;
+	background: #fff;
+}
+
+.logo {
+	float: left;
+	width: 120px;
+	height: 64px;
+}
+
+.ant-layout-header .ant-menu-root {
+	display: inline-block;
+	width: 204px;
+}
+
+.ant-layout-header .eth-account {
+	display: inline-block;
+	float: right;
+}
+
+.ant-layout-header .eth-account .ant-typography a {
+	color: #ffffff !important;
+}
+
+.ant-layout-header .eth-balance {
+	color: #ffffff;
+}
+
+.ant-layout-header .eth-avatar {
+	top: 6px;
+	position: relative;
 }
