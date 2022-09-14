@@ -21,7 +21,7 @@ const walletLinkProvider = walletLink.makeWeb3Provider(`https://eth-mainnet.alch
 const web3ModalSetup = () =>
   new Web3Modal({
     network: "mainnet", // Optional. If using WalletConnect on xDai, change network to "xdai" and add RPC info below for xDai chain.
-    cacheProvider: true, // optional
+    cacheProvider: false, // optional
     theme: "light", // optional. Change to "dark" for a dark theme.
     providerOptions: {
       walletconnect: {
@@ -72,7 +72,8 @@ const web3ModalSetup = () =>
       // },
       "custom-walletlink": {
         display: {
-          logo: "https://play-lh.googleusercontent.com/PjoJoG27miSglVBXoXrxBSLveV6e3EeBPpNY55aiUUBM9Q1RCETKCOqdOkX2ZydqVf0",
+          logo:
+            "https://play-lh.googleusercontent.com/PjoJoG27miSglVBXoXrxBSLveV6e3EeBPpNY55aiUUBM9Q1RCETKCOqdOkX2ZydqVf0",
           name: "Coinbase",
           description: "Connect to Coinbase Wallet (not Coinbase App)",
         },

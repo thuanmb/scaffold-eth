@@ -235,3 +235,8 @@ export const NETWORK = chainId => {
     }
   }
 };
+export const INITIAL_NETWORK = NETWORKS.localhost.name;
+
+export const USE_BURNER_WALLET = true; // toggle burner wallet feature
+
+export const NETWORKCHECK = true;

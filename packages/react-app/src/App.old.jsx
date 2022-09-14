@@ -405,14 +405,8 @@ function App(props) {
 
         <Row align="middle" gutter={[4, 4]}>
           <Col span={24}>
-            {
-              /*  if the local provider has a signer, let's show the faucet:  */
-              faucetAvailable ? (
-                <Faucet localProvider={localProvider} price={price} ensProvider={mainnetProvider} />
-              ) : (
-                ""
-              )
-            }
+            {/*  if the local provider has a signer, let's show the faucet:  */
+            faucetAvailable ? <Faucet localProvider={localProvider} price={price} ensProvider={mainnetProvider} /> : ""}
           </Col>
         </Row>
       </div>

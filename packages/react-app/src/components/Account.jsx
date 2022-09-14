@@ -1,4 +1,3 @@
-import { Button } from "antd";
 import React from "react";
 import { useThemeSwitcher } from "react-css-theme-switcher";
 
@@ -20,9 +19,6 @@ import Wallet from "./Wallet";
     userProvider={userProvider}
     mainnetProvider={mainnetProvider}
     price={price}
-    web3Modal={web3Modal}
-    loadWeb3Modal={loadWeb3Modal}
-    logoutOfWeb3Modal={logoutOfWeb3Modal}
     blockExplorer={blockExplorer}
     isContract={boolean}
   />
@@ -35,8 +31,6 @@ import Wallet from "./Wallet";
   - Provide mainnetProvider={mainnetProvider} and your address will be replaced by ENS name
               (ex. "0xa870" => "user.eth")
   - Provide price={price} of ether and get your balance converted to dollars
-  - Provide web3Modal={web3Modal}, loadWeb3Modal={loadWeb3Modal}, logoutOfWeb3Modal={logoutOfWeb3Modal}
-              to be able to log in/log out to/from existing accounts
   - Provide blockExplorer={blockExplorer}, click on address and get the link
               (ex. by default "https://etherscan.io/" or for xdai "https://blockscout.com/poa/xdai/")
 **/
@@ -48,20 +42,10 @@ export default function Account({
   mainnetProvider,
   price,
   minimized,
-  web3Modal,
-  loadWeb3Modal,
-  logoutOfWeb3Modal,
   blockExplorer,
   isContract,
 }) {
   const { currentTheme } = useThemeSwitcher();
-
-  let accountButtonInfo;
-  if (web3Modal?.cachedProvider) {
-    accountButtonInfo = { name: "Logout", action: logoutOfWeb3Modal };
-  } else {
-    accountButtonInfo = { name: "Connect", action: loadWeb3Modal };
-  }
 
   const display = !minimized && (
     <span>
@@ -84,14 +68,5 @@ export default function Account({
     </span>
   );
 
-  return (
-    <div className="eth-account">
-      {display}
-      {web3Modal && (
-        <Button style={{ marginLeft: 8 }} shape="round" onClick={accountButtonInfo.action}>
-          {accountButtonInfo.name}
-        </Button>
-      )}
-    </div>
-  );
+  return <div className="eth-account">{display}</div>;
 }
