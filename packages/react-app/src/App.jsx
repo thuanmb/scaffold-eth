@@ -22,6 +22,7 @@ import useEPContract from "./hooks/useEPContract";
 
 import { getAddress, setAddress } from "./store/accountSlice";
 import { getTargetNetwork } from "./store/networkSlice";
+import { isDebugMode } from "./store/appConfigSlice";
 
 import { USE_BURNER_WALLET, NETWORKCHECK } from "./constants";
 
@@ -36,6 +37,7 @@ const App = () => {
 
   const address = useSelector(getAddress);
   const targetNetwork = useSelector(getTargetNetwork);
+  const debug = useSelector(isDebugMode);
 
   // 🔭 block explorer URL
   const blockExplorer = targetNetwork.blockExplorer;
@@ -64,7 +66,7 @@ const App = () => {
   const localChainId = localProvider && localProvider._network && localProvider._network.chainId;
   const [readContracts, writeContracts, tx] = useEPContract(localProvider, userSigner, localChainId);
 
-  const surveyList = useContractReader(readContracts, "SurveysPage", "getSurveyList");
+  const surveyList = useContractReader(readContracts, "SurveyContract", "getSurveyList");
   console.log("thuan", surveyList);
 
   //
@@ -99,7 +101,8 @@ const App = () => {
         }}
       >
         <Router history={history}>
-          <AuthorizedRoute exact path="/" component={SurveysPage} componentProps={{ writeContracts, tx }} />
+          {!debug && <AuthorizedRoute exact path="/" component={SurveysPage} componentProps={{ writeContracts, tx }} />}
+          {debug && <SurveysPage writeContracts={writeContracts} tx={tx} />}
           <Route
             path="/connectWallet"
             render={props => (

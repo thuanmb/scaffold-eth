@@ -14,10 +14,7 @@ module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
     from: deployer,
     // args: [ "Hello", ethers.utils.parseEther("1.5") ],
     log: true,
-    waitConfirmations: 5,
+    // waitConfirmations: 5,
   });
-
-  // Getting a previously deployed contract
-  const SurveyContract = await ethers.getContract("SurveyContract", deployer);
 };
 module.exports.tags = ["SurveyContract"];
