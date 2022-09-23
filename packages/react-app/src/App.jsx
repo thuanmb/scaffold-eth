@@ -6,7 +6,7 @@ import { Router, Route, Redirect, useHistory } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 
 import { ethers } from "ethers";
-import { useBalance } from "eth-hooks";
+import { useBalance, useContractReader } from "eth-hooks";
 import { useExchangeEthPrice } from "eth-hooks/dapps/dex";
 
 import { Layout } from "antd";
@@ -18,6 +18,7 @@ import ConnectWalletPage from "./views/ConnectWalletPage";
 import AuthorizedRoute from "./components/AuthorizedRoute";
 
 import useBlockchainProvider from "./hooks/useBlockchainProvider";
+import useEPContract from "./hooks/useEPContract";
 
 import { getAddress, setAddress } from "./store/accountSlice";
 import { getTargetNetwork } from "./store/networkSlice";
@@ -59,6 +60,13 @@ const App = () => {
   const yourLocalBalance = useBalance(localProvider, address);
   const yourMainnetBalance = useBalance(mainnetProvider, address);
 
+  // setup readContracts and writeContracts
+  const localChainId = localProvider && localProvider._network && localProvider._network.chainId;
+  const [readContracts, writeContracts, tx] = useEPContract(localProvider, userSigner, localChainId);
+
+  const surveyList = useContractReader(readContracts, "SurveysPage", "getSurveyList");
+  console.log("thuan", surveyList);
+
   //
   // 🧫 DEBUG 👨🏻‍🔬
   //
@@ -91,7 +99,7 @@ const App = () => {
         }}
       >
         <Router history={history}>
-          <AuthorizedRoute exact path="/" component={SurveysPage} />
+          <AuthorizedRoute exact path="/" component={SurveysPage} componentProps={{ writeContracts, tx }} />
           <Route
             path="/connectWallet"
             render={props => (

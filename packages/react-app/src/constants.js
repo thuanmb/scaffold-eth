@@ -9,6 +9,12 @@ export const BLOCKNATIVE_DAPPID = "0b58206a-f3c0-4701-a62f-73c7243e8c77";
 
 export const ALCHEMY_KEY = "oKxs-03sij-U_N0iOlrSsZFr29-IqbuF";
 
+export const PROVIDERS = [
+  "https://eth-mainnet.gateway.pokt.network/v1/lb/611156b4a585a20035148406",
+  `https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_KEY}`,
+  "https://rpc.scaffoldeth.io:48544",
+];
+
 const localRpcUrl = process.env.REACT_APP_CODESPACES
   ? `https://${window.location.hostname.replace("3000", "8545")}`
   : "http://" + (global.window ? window.location.hostname : "localhost") + ":8545";
@@ -235,6 +241,7 @@ export const NETWORK = chainId => {
     }
   }
 };
+
 export const INITIAL_NETWORK = NETWORKS.localhost.name;
 
 export const USE_BURNER_WALLET = true; // toggle burner wallet feature

@@ -26,7 +26,7 @@ And learn more here: https://www.npmjs.com/package/hardhat-deploy
 const main = async () => {
   console.log("\n\n 📡 Deploying...\n");
 
-  const yourContract = await deploy("YourContract"); // <-- add in constructor args like line 19 vvvv
+  const surveyContract = await deploy("SurveyContract"); // <-- add in constructor args like line 19 vvvv
   // use for local token bridging
   // const mockToken = await deploy("MockERC20") // <-- add in constructor args like line 19 vvvv
 
@@ -69,19 +69,10 @@ const main = async () => {
   })
   */
 
-  console.log(
-    " 💾  Artifacts (address, abi, and args) saved to: ",
-    chalk.blue("packages/hardhat/artifacts/"),
-    "\n\n"
-  );
+  console.log(" 💾  Artifacts (address, abi, and args) saved to: ", chalk.blue("packages/hardhat/artifacts/"), "\n\n");
 };
 
-const deploy = async (
-  contractName,
-  _args = [],
-  overrides = {},
-  libraries = {}
-) => {
+const deploy = async (contractName, _args = [], overrides = {}, libraries = {}) => {
   console.log(` 🛰  Deploying: ${contractName}`);
 
   const contractArgs = _args || [];
@@ -94,20 +85,11 @@ const deploy = async (
 
   let extraGasInfo = "";
   if (deployed && deployed.deployTransaction) {
-    const gasUsed = deployed.deployTransaction.gasLimit.mul(
-      deployed.deployTransaction.gasPrice
-    );
-    extraGasInfo = `${utils.formatEther(gasUsed)} ETH, tx hash ${
-      deployed.deployTransaction.hash
-    }`;
+    const gasUsed = deployed.deployTransaction.gasLimit.mul(deployed.deployTransaction.gasPrice);
+    extraGasInfo = `${utils.formatEther(gasUsed)} ETH, tx hash ${deployed.deployTransaction.hash}`;
   }
 
-  console.log(
-    " 📄",
-    chalk.cyan(contractName),
-    "deployed to:",
-    chalk.magenta(deployed.address)
-  );
+  console.log(" 📄", chalk.cyan(contractName), "deployed to:", chalk.magenta(deployed.address));
   console.log(" ⛽", chalk.grey(extraGasInfo));
 
   await tenderly.persistArtifacts({
@@ -128,25 +110,16 @@ const deploy = async (
 // for example, on Etherscan
 const abiEncodeArgs = (deployed, contractArgs) => {
   // not writing abi encoded args if this does not pass
-  if (
-    !contractArgs ||
-    !deployed ||
-    !R.hasPath(["interface", "deploy"], deployed)
-  ) {
+  if (!contractArgs || !deployed || !R.hasPath(["interface", "deploy"], deployed)) {
     return "";
   }
-  const encoded = utils.defaultAbiCoder.encode(
-    deployed.interface.deploy.inputs,
-    contractArgs
-  );
+  const encoded = utils.defaultAbiCoder.encode(deployed.interface.deploy.inputs, contractArgs);
   return encoded;
 };
 
 // checks if it is a Solidity file
 const isSolidity = (fileName) =>
-  fileName.indexOf(".sol") >= 0 &&
-  fileName.indexOf(".swp") < 0 &&
-  fileName.indexOf(".swap") < 0;
+  fileName.indexOf(".sol") >= 0 && fileName.indexOf(".swp") < 0 && fileName.indexOf(".swap") < 0;
 
 const readArgsFile = (contractName) => {
   let args = [];
@@ -166,25 +139,11 @@ function sleep(ms) {
 
 // If you want to verify on https://tenderly.co/
 const tenderlyVerify = async ({ contractName, contractAddress }) => {
-  let tenderlyNetworks = [
-    "kovan",
-    "goerli",
-    "mainnet",
-    "rinkeby",
-    "ropsten",
-    "matic",
-    "mumbai",
-    "xDai",
-    "POA",
-  ];
+  let tenderlyNetworks = ["kovan", "goerli", "mainnet", "rinkeby", "ropsten", "matic", "mumbai", "xDai", "POA"];
   let targetNetwork = process.env.HARDHAT_NETWORK || config.defaultNetwork;
 
   if (tenderlyNetworks.includes(targetNetwork)) {
-    console.log(
-      chalk.blue(
-        ` 📁 Attempting tenderly verification of ${contractName} on ${targetNetwork}`
-      )
-    );
+    console.log(chalk.blue(` 📁 Attempting tenderly verification of ${contractName} on ${targetNetwork}`));
 
     await tenderly.persistArtifacts({
       name: contractName,
@@ -199,9 +158,7 @@ const tenderlyVerify = async ({ contractName, contractAddress }) => {
 
     return verification;
   } else {
-    console.log(
-      chalk.grey(` 🧐 Contract verification not supported on ${targetNetwork}`)
-    );
+    console.log(chalk.grey(` 🧐 Contract verification not supported on ${targetNetwork}`));
   }
 };
 

@@ -6,14 +6,7 @@ import useStaticJsonRPC from "./useStaticJsonRPC";
 
 import { getTargetNetwork } from "../store/networkSlice";
 
-import { ALCHEMY_KEY, USE_BURNER_WALLET } from "../constants";
-
-// 🛰 providers
-const PROVIDERS = [
-  "https://eth-mainnet.gateway.pokt.network/v1/lb/611156b4a585a20035148406",
-  `https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_KEY}`,
-  "https://rpc.scaffoldeth.io:48544",
-];
+import { USE_BURNER_WALLET, PROVIDERS } from "../constants";
 
 const useBlockchainProvider = () => {
   const targetNetwork = useSelector(getTargetNetwork);

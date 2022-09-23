@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 
 import { getAddress } from "../store/accountSlice";
 
-const AuthorizedRoute = ({ component: Component, ...rest }) => {
+const AuthorizedRoute = ({ component: Component, componentProps, ...rest }) => {
   const address = useSelector(getAddress);
 
   return (
@@ -17,7 +17,7 @@ const AuthorizedRoute = ({ component: Component, ...rest }) => {
         }
         //
         // authorized so return component
-        return <Component {...props} />;
+        return <Component {...props} {...componentProps} />;
       }}
     />
   );

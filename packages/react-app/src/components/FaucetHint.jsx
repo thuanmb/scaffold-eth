@@ -28,7 +28,7 @@ function FaucetHint({ localProvider, targetNetwork, address }) {
     ethers.utils.formatEther(yourLocalBalance) <= 0
   ) {
     faucetHint = (
-      <div style={{ position: "absolute", right: 65, top: 65 }}>
+      <span>
         <Button
           type="primary"
           onClick={() => {
@@ -41,7 +41,7 @@ function FaucetHint({ localProvider, targetNetwork, address }) {
         >
           💰 Grab funds from the faucet ⛽️
         </Button>
-      </div>
+      </span>
     );
   }
 
