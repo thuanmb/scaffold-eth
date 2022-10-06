@@ -6,7 +6,7 @@ import { Router, Route, Redirect, useHistory } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 
 import { ethers } from "ethers";
-import { useBalance, useContractReader } from "eth-hooks";
+import { useBalance } from "eth-hooks";
 import { useExchangeEthPrice } from "eth-hooks/dapps/dex";
 
 import { Layout } from "antd";
@@ -19,6 +19,7 @@ import AuthorizedRoute from "./components/AuthorizedRoute";
 
 import useBlockchainProvider from "./hooks/useBlockchainProvider";
 import useEPContract from "./hooks/useEPContract";
+import useGetSurveys from "./hooks/useGetSurveys";
 
 import { getAddress, setAddress } from "./store/accountSlice";
 import { getTargetNetwork } from "./store/networkSlice";
@@ -64,10 +65,10 @@ const App = () => {
 
   // setup readContracts and writeContracts
   const localChainId = localProvider && localProvider._network && localProvider._network.chainId;
-  const [readContracts, writeContracts, tx] = useEPContract(localProvider, userSigner, localChainId);
+  const [readContracts, writeContracts, tx] = useEPContract(userSigner, localChainId);
 
-  const surveyList = useContractReader(readContracts, "SurveyContract", "getSurveyList");
-  console.log("thuan", surveyList);
+  // trigger get the survey list
+  useGetSurveys(readContracts);
 
   //
   // 🧫 DEBUG 👨🏻‍🔬

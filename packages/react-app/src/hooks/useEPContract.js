@@ -11,9 +11,9 @@ import { Transactor } from "../helpers";
 
 const contractConfig = { deployedContracts: deployedContracts || {}, externalContracts: externalContracts || {} };
 
-const useEPContract = (localProvider, userSigner, localChainId) => {
+const useEPContract = (userSigner, localChainId) => {
   // Load in your local 📝 contract and read a value from it:
-  const readContracts = useContractLoader(localProvider, contractConfig);
+  const readContracts = useContractLoader(userSigner, contractConfig, localChainId);
 
   // If you want to make 🔐 write transactions to your contracts, use the userSigner:
   const writeContracts = useContractLoader(userSigner, contractConfig, localChainId);

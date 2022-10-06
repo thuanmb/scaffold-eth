@@ -2,6 +2,12 @@ import React from "react";
 import { PageHeader, Button } from "antd";
 import { ethers } from "ethers";
 
+import { useSelector } from "react-redux";
+
+import { getSurveyList, getSurveyLoading } from "../store/surveysSlice";
+
+import SurveyList from "./SurveyList";
+
 const toHexString = jsonObj => {
   let jsonStr = JSON.stringify(jsonObj);
   let bytesArr = ethers.utils.toUtf8Bytes(jsonStr);
@@ -65,6 +71,8 @@ const SAMPLE_SURVEY_DESCRIPTOR = {
   ],
 };
 const SurveysPage = ({ writeContracts, tx }) => {
+  const surveyData = useSelector(getSurveyList);
+  const isLoading = useSelector(getSurveyLoading);
   return (
     <PageHeader
       ghost={false}
@@ -103,7 +111,9 @@ const SurveysPage = ({ writeContracts, tx }) => {
         </Button>,
       ]}
     >
-      <div className="site-layout-content">Content</div>
+      <div className="site-layout-content">
+        <SurveyList surveyData={surveyData} isLoading={isLoading} />
+      </div>
     </PageHeader>
   );
 };
