@@ -13,6 +13,7 @@ import { Layout } from "antd";
 
 import TopBar from "./views/TopBar";
 import SurveysPage from "./views/SurveysPage";
+import SurveyCreatePage from "./views/SurveyCreatePage";
 import ConnectWalletPage from "./views/ConnectWalletPage";
 
 import AuthorizedRoute from "./components/AuthorizedRoute";
@@ -84,6 +85,24 @@ const App = () => {
     }
   }, [mainnetProvider, address, yourLocalBalance, yourMainnetBalance, userSigner]);
 
+  const routesOnProdMode = [
+    <Redirect from="*" to="/" />,
+    <AuthorizedRoute exact path="/" component={SurveysPage} componentProps={{ mainnetProvider, blockExplorer }} />,
+    <AuthorizedRoute exact path="/createSurvey" component={SurveyCreatePage} componentProps={{ writeContracts, tx }} />,
+  ];
+
+  const routesOnDebugMode = [
+    <Redirect from="/" to="/surveys" />,
+    <Route
+      path="/surveys"
+      render={props => <SurveysPage {...props} mainnetProvider={mainnetProvider} blockExplorer={blockExplorer} />}
+    />,
+    <Route
+      path="/createSurvey"
+      render={props => <SurveyCreatePage {...props} writeContracts={writeContracts} tx={tx} />}
+    />,
+  ];
+
   return (
     <Layout className="layout">
       <TopBar
@@ -102,8 +121,8 @@ const App = () => {
         }}
       >
         <Router history={history}>
-          {!debug && <AuthorizedRoute exact path="/" component={SurveysPage} componentProps={{ writeContracts, tx }} />}
-          {debug && <SurveysPage writeContracts={writeContracts} tx={tx} />}
+          {!debug && routesOnProdMode}
+          {debug && routesOnDebugMode}
           <Route
             path="/connectWallet"
             render={props => (
@@ -114,7 +133,6 @@ const App = () => {
               />
             )}
           />
-          <Redirect from="*" to="/" />
         </Router>
       </Content>
       <Footer

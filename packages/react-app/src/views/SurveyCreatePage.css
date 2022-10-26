@@ -1,0 +1,32 @@
+.scp-page {
+}
+
+.scp-page__content {
+	position: relative;
+	padding: calc(1 * var(--base-unit, 8px)) calc(0 * var(--base-unit, 8px)) calc(3 * var(--base-unit, 8px));
+	box-sizing: border-box;
+	width: 100%;
+	outline: none;
+	border-radius: 3px;
+}
+
+.scp-page__content:hover,
+.scp-page__content:focus {
+	background: rgba(64, 169, 255, 0.1);
+}
+
+.scp-page__body {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	width: 100%;
+	box-sizing: border-box;
+
+	margin: 0;
+	padding: calc(1 * var(--base-unit, 8px)) calc(3 * var(--base-unit, 8px)) calc(2 * var(--base-unit, 8px));
+}
+
+.scp-page__body .h3 {
+	display: flex;
+}
